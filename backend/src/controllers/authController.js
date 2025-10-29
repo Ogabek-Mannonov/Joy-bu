@@ -71,3 +71,59 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Server xatosi" });
   }
 };
+
+
+// Create Admin
+
+export const createAdmin = async (req, res) => {
+  const { first_name, last_name, username, email, phone, password } = req.body;
+
+  try {
+    // Email yoki username mavjudligini tekshirish
+    const checkUser = await pool.query(
+      "SELECT * FROM users WHERE email = $1 OR username = $2",
+      [email, username]
+    );
+    if (checkUser.rows.length > 0) {
+      return res.status(400).json({ message: "Bu email yoki username allaqachon mavjud" });
+    }
+
+    // Parolni hash qilish
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Adminni yaratish
+    const newAdmin = await pool.query(
+      `INSERT INTO users (first_name, last_name, username, email, phone, password_hash, role, created_at, updated_at)
+       VALUES ($1,$2,$3,$4,$5,$6,'admin',NOW(),NOW())
+       RETURNING id, username, email, role`,
+      [first_name, last_name, username, email, phone, hashedPassword]
+    );
+
+    res.status(201).json({
+      message: "Admin muvaffaqiyatli yaratildi",
+      admin: newAdmin.rows[0],
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Admin yaratishda xatolik" });
+  }
+};
+
+
+// Get Users
+
+export const getUsers = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, first_name, last_name, username, email, phone, role, created_at FROM users ORDER BY id ASC"
+    );
+
+    res.json({
+      message: "Barcha foydalanuvchilar ro‘yxati",
+      users: result.rows,
+    });
+  } catch (err) {
+    console.error("❌ getUsers xatosi:", err.message);
+    res.status(500).json({ message: "Server xatosi" });
+  }
+};
