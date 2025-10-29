@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { errorHandler, notFound } from "./src/middlewares/errorMiddleware.js";
 
 // Routers
-// import authRoutes from "./src/routes/authRoutes.js";
+import authRoutes from "./src/routes/authRoutes.js";
 // import userRoutes from "./src/routes/userRoutes.js";
 // import venueRoutes from "./src/routes/venueRoutes.js";
 // import bookingRoutes from "./src/routes/bookingRoutes.js";
@@ -14,11 +14,10 @@ import { errorHandler, notFound } from "./src/middlewares/errorMiddleware.js";
 // import postRoutes from "./src/routes/postRoutes.js";
 // import commentRoutes from "./src/routes/commentRoutes.js";
 
-// DB config
-import connectDB from "./config/db.js";
+import pool from "./config/db.js";
 
 dotenv.config();
-connectDB();
+pool();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,7 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 // Route’lar
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 // app.use("/api/users", userRoutes);
 // app.use("/api/venues", venueRoutes);
 // app.use("/api/bookings", bookingRoutes);
@@ -50,5 +49,5 @@ app.use(errorHandler);
 
 // Serverni ishga tushirish
 app.listen(PORT, () => {
-  console.log(`✅ Server ${PORT}-portda ishlayapti...`);
+  console.log(`Server ${PORT}-portda ishlayapti...`);
 });
