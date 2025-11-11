@@ -119,11 +119,27 @@ export const getUsers = async (req, res) => {
     );
 
     res.json({
-      message: "Barcha foydalanuvchilar ro‘yxati",
+      message: "Barcha foydalanuvchilar ro'yxati",
       users: result.rows,
     });
   } catch (err) {
-    console.error("❌ getUsers xatosi:", err.message);
+    console.error("GetUsers xatosi:", err.message);
+    res.status(500).json({ message: "Server xatosi" });
+  }
+};
+
+export const getAdmin = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, first_name, last_name, username, email, phone, role, created_at FROM users WHERE role = 'admin' ORDER BY id ASC"
+    );
+
+    res.json({
+      message: "Admin foydalanuvchilar ro'yxati",
+      admins: result.rows,
+    });
+  } catch (err) {
+    console.error("GetAdmin xatosi:", err.message);
     res.status(500).json({ message: "Server xatosi" });
   }
 };
